@@ -1,0 +1,47 @@
+# Version de docker-compose que se esta usando
+version: '3'
+
+# define the network
+networks:
+  web-network:
+
+# Iniciar los servicios
+services:
+  # Definir los nombres de los servicios
+  # que corresponde al parametro "--name"
+  docker-php-cli:
+  # Define el directio donde se contruye la imagen
+  # es la ubicacion donde esta el dockerfile
+    build:
+      context: ./php-cli
+     # network: web-network 
+    # Hay que asignar un tty, es el parametro "-i", de lo contrrio
+    # el contenedor se muere
+    tty: true
+    # Define el punto(s) de montaje(es) del contenedor,
+    # el parametro "-v"
+    volumes:
+      - ./app:/var/www
+    # Indica que se conecte a la red denifida en el parametro iniciar del docker-compose networks:
+    # Siendo el parametro "--network" en el comando docker
+    networks:
+      - web-network
+  docker-php-fpm:
+    build:
+      context: ./php-fpm
+    tty: true
+    volumes:
+      - ./app:/var/www
+    networks:
+      - web-network  
+  docker-nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"      
+    tty: true
+    volumes:
+      - ./app:/var/www
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - web-network
