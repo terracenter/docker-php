@@ -4,33 +4,11 @@ version: '3'
 # define the network
 networks:
   web-network:
+
 # Iniciar los servicios
 services:
   # Definir los nombres de los servicios
   # que corresponde al parametro "--name"
-  # PostgreSQL
-  postgres:
-    image: postgres:14
-    restart: always
-    environment: 
-      - DATABASE_HOST=127.0.0.1
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=root
-    ports: 
-      - 5432:5432
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-  pgadmin:
-    image: dpage/pgadmin4
-    environment: 
-      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
-      PGADMIN_DEFAULT_PASSWORD: "admin"
-    ports:
-      - "8080:80"
-    depends_on: 
-      - postgres
-  # PHP
   docker-php-cli:
   # Define el directio donde se contruye la imagen
   # es la ubicacion donde esta el dockerfile
@@ -43,7 +21,7 @@ services:
     # Define el punto(s) de montaje(es) del contenedor,
     # el parametro "-v"
     volumes:
-      - ./app:/var/www
+      - ./app:/var/www/html
     # Indica que se conecte a la red denifida en el parametro iniciar del docker-compose networks:
     # Siendo el parametro "--network" en el comando docker
     networks:
@@ -53,7 +31,7 @@ services:
       context: ./php-fpm
     tty: true
     volumes:
-      - ./app:/var/www
+      - ./app:/var/www/html
     networks:
       - web-network  
   docker-nginx:
@@ -63,7 +41,7 @@ services:
       - "80:80"      
     tty: true
     volumes:
-      - ./app:/var/www
+      - ./app:/var/www/html
       - ./nginx/conf.d:/etc/nginx/conf.d
     networks:
       - web-network
