@@ -1,16 +1,32 @@
-# Version de docker-compose que se esta usando
-version: '3'
-
-# define the network
+version: '3.10'
 networks:
   web-network:
+  backend:
 
 volumes:
-  data:
-# Iniciar los servicios
+    data:
+    app:
+
+
 services:
-  # Definir los nombres de los servicios
-  # que corresponde al parametro "--name"
+  db:
+    hostname: mariadb-01
+    image: mariadb:11.2.2-jammy
+    container_name: mariadb-01
+    networks:
+      - backend
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: desarrollo
+      MYSQL_USER: freddy
+      MYSQL_PASSWORD: 1234
+    volumes:
+      - data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+  
+   
   docker-php-cli:
   # Define el directio donde se contruye la imagen
   # es la ubicacion donde esta el dockerfile
@@ -28,6 +44,7 @@ services:
     # Siendo el parametro "--network" en el comando docker
     networks:
       - web-network
+  
   docker-php-fpm:
     build:
       context: ./php-fpm
@@ -42,18 +59,11 @@ services:
     ports:
       - "80:80"      
     tty: true
-  db:
-    image: mariadb:11.2.2-jammy
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: desarrollo
-      MYSQL_USER: freddy
-      MYSQL_PASSWORD: 1234
-    ports:
-      - "3306:3306"
+
     volumes:
       - ./app:/var/www/html
       - ./nginx/conf.d:/etc/nginx/conf.d
       - data:/var/lib/mysql
     networks:
       - web-network
+      - backend
