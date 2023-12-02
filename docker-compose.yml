@@ -5,6 +5,8 @@ version: '3'
 networks:
   web-network:
 
+volumes:
+  data:
 # Iniciar los servicios
 services:
   # Definir los nombres de los servicios
@@ -40,8 +42,18 @@ services:
     ports:
       - "80:80"      
     tty: true
+  db:
+    image: mariadb:11.2.2-jammy
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: desarrollo
+      MYSQL_USER: freddy
+      MYSQL_PASSWORD: 1234
+    ports:
+      - "3306:3306"
     volumes:
       - ./app:/var/www/html
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - data:/var/lib/mysql
     networks:
       - web-network
