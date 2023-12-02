@@ -10,9 +10,9 @@ volumes:
 
 services:
   db:
-    hostname: mariadb-01
+    hostname: mariadb
     image: mariadb:11.2.2-jammy
-    container_name: mariadb-01
+    container_name: mariadb
     networks:
       - backend
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
@@ -28,6 +28,8 @@ services:
   
    
   docker-php-cli:
+    hostname: php-cli
+    container_name: php-cli
   # Define el directio donde se contruye la imagen
   # es la ubicacion donde esta el dockerfile
     build:
@@ -46,14 +48,19 @@ services:
       - web-network
   
   docker-php-fpm:
+    hostname: php-fpm
+    container_name: php-fpm
     build:
       context: ./php-fpm
     tty: true
     volumes:
       - ./app:/var/www/html
     networks:
-      - web-network  
+      - web-network
+
   docker-nginx:
+    hostname: nginx
+    container_name: nginx
     build:
       context: ./nginx
     ports:
